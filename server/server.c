@@ -93,7 +93,7 @@ int main() {
             continue;
         }
         // create for each client a thread
-        int thread_id;
+        pthread_t thread_id;
         if (pthread_create(&thread_id, NULL, handle_client, (void*)&new_socket) < 0) {
             printf("could not create thread for client\n");
             close(new_socket);
