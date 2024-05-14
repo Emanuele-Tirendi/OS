@@ -48,9 +48,13 @@ void handle_user_command(char* user_input, int sock) {
     if (strcmp_wl(user_input, "echo\n") == 0) {
         send(sock, user_input, strlen(user_input), 0);
     } 
-    //request the html file
     else if (strcmp_wl(user_input, "html\n") == 0) {
         send(sock, user_input, strlen(user_input), 0);
+    }
+    else if (strcmp_wl(user_input, "quit\n") == 0){
+        send(sock, user_input, strlen(user_input), 0);
+        printf("Disconnect from the server\n");
+        close(sock);
     }
     else {
         printf("not valid user command: %s", user_input);
@@ -66,15 +70,12 @@ void handle_server_command(char* server_input, int sock) {
     if (strcmp_wl(server_input, "echo\n") == 0) {
         printf("server sent %s", server_input);
         user_input_possible = true;
-    }
-    //commad to handle the html request
+    } 
     else if (strncmp(server_input, "<!DOCTYPE html>", strlen("<!DOCTYPE html>")) == 0){
-        //creates and opens a html file then copies the code into it
         FILE *html;
         html = fopen("index.html", "w");
         fprintf(html, "%s" ,server_input);
         fclose(html);
-        //opens the html file in the browser
         system("xdg-open index.html");
         user_input_possible = true;
     }
@@ -128,6 +129,10 @@ void* handle_server(void* input) {
         if (bytes_received == 0) {
             printf("connection to server lost\n");
             close(sock);
+            const char *filename = "index.html";
+            if (access(filename, F_OK) != -1) {
+                remove("index.html");
+            }
             exit(0);
         }
         handle_server_command(server_input, sock);

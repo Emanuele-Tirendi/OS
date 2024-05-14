@@ -20,10 +20,8 @@ void handle_client_command(char* client_input, int sock) {
         printf("client sent %s", client_input);
         send(sock, client_input, strlen(client_input), 0);
     }
-    //command that handles the html request
     else if(strcmp_wl(client_input, "html\n") == 0){
         usleep(2000000);
-        //opens the files and reads all characters, then puts them into the string buffer to send
         FILE *html_file;
         html_file = fopen("example.html", "r");
         char buffer[1000];
@@ -37,9 +35,9 @@ void handle_client_command(char* client_input, int sock) {
 
         fclose(html_file);
         send(sock, buffer, strlen(buffer), 0);
-    } 
+    }
     else {
-        printf("not valid client command: %s\n", client_input);
+        printf("not valid client command: %s server\n", client_input);
     }
 }
 
@@ -64,6 +62,10 @@ void *handle_client(void *socket_desc) {
             close(sock);
             return NULL;
         }
+        if (strcmp_wl(client_input, "quit\n") == 0){
+            close(sock);
+            return NULL;
+        }   
         handle_client_command(client_input, sock);
     }
     return NULL;
