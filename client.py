@@ -12,7 +12,7 @@ os.chdir("client")
 
 # Compile C++ code
 if "-c" in sys.argv:
-    compile_command = "gcc client.c ../shared/constants.h ../shared/constants.c -o client"
+    compile_command = "gcc client.c ../shared/constants.h ../shared/constants.c ../shared/time.h ../shared/time.c ../shared/log.h ../shared/log.c IO.h IO.c -o client"
     compile_status = os.system(compile_command)
     print("compiled client")
 

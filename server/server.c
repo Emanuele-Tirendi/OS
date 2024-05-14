@@ -6,49 +6,9 @@
 #include <pthread.h>
 
 #include "../shared/constants.h"
-
-#define HTML_FILE "index.html"
-
-/*
-Here we will make the main if else case distinction for the client commands. So
-if you introduce a new command coming from the client, make a new else if case in this 
-function.
-*/
-void handle_client_command(char* client_input, int sock) {
-    if (strcmp_wl(client_input, "echo\n") == 0) {
-        usleep(2000000);
-        printf("client sent %s", client_input);
-        send(sock, client_input, strlen(client_input), 0);
-    } else {
-        printf("not valid client command: %s\n", client_input);
-    }
-}
-
-void *handle_client(void *socket_desc) {
-    int* socket = (int*) socket_desc;
-    int sock = *socket;
-
-    // buffer for messages sent from client.
-    char client_input[CLIENT_INPUT_SIZE];
-    /*
-    This loop is the main loop for the thread to get messages of the client
-    and handle them.
-    */
-    while (1) {
-        // zero out the buffer
-        memset(client_input, 0, CLIENT_INPUT_SIZE);
-        // receive message from client
-        ssize_t bytes_received = recv(sock, client_input, CLIENT_INPUT_SIZE, 0);
-        // detect if clients isn't connected anymore
-        if (bytes_received == 0) {
-            printf("client not connected anymore\n");
-            close(sock);
-            return NULL;
-        }
-        handle_client_command(client_input, sock);
-    }
-    return NULL;
-}
+#include "../shared/time.h"
+#include "../shared/log.h"
+#include "IO.h"
 
 int main() {
     int server_fd;
@@ -84,6 +44,8 @@ int main() {
         return 0;
     }
     
+    log_m('s', 'l', "start logging");
+
     while (1) {
         // accept incoming client
         int new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);

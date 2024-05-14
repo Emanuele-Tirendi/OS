@@ -12,7 +12,7 @@ os.chdir("server")
 
 # Compile C++ code
 if "-c" in sys.argv:
-    compile_command = "gcc server.c ../shared/constants.h ../shared/constants.c -o server"
+    compile_command = "gcc server.c ../shared/constants.h ../shared/constants.c ../shared/time.h ../shared/time.c ../shared/log.h ../shared/log.c IO.h IO.c -o server"
     compile_status = os.system(compile_command)
     print("compiled server")
 
