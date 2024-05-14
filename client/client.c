@@ -47,7 +47,12 @@ function.
 void handle_user_command(char* user_input, int sock) {
     if (strcmp_wl(user_input, "echo\n") == 0) {
         send(sock, user_input, strlen(user_input), 0);
-    } else {
+    } 
+    //request the html file
+    else if (strcmp_wl(user_input, "html\n") == 0) {
+        send(sock, user_input, strlen(user_input), 0);
+    }
+    else {
         printf("not valid user command: %s", user_input);
     }
 }
@@ -61,7 +66,19 @@ void handle_server_command(char* server_input, int sock) {
     if (strcmp_wl(server_input, "echo\n") == 0) {
         printf("server sent %s", server_input);
         user_input_possible = true;
-    } else {
+    }
+    //commad to handle the html request
+    else if (strncmp(server_input, "<!DOCTYPE html>", strlen("<!DOCTYPE html>")) == 0){
+        //creates and opens a html file then copies the code into it
+        FILE *html;
+        html = fopen("index.html", "w");
+        fprintf(html, "%s" ,server_input);
+        fclose(html);
+        //opens the html file in the browser
+        system("xdg-open index.html");
+        user_input_possible = true;
+    }
+    else {
         printf("not valid server command: %s\n", server_input);
     }
 }
