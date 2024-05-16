@@ -10,6 +10,16 @@
 #include "../shared/log.h"
 #include "IO.h"
 
+int get_next_id() {
+    for (int i = 0; i < NUMBER_OF_CLIENTS; i++) {
+        if (!need_to_close[i][1]) {
+            need_to_close[i][1] = true;
+            return i;
+        }
+    }
+    return -1;
+}
+
 int main() {
     int server_fd;
     struct sockaddr_in address;
@@ -44,7 +54,12 @@ int main() {
         return 0;
     }
     
-    log_m('s', 'l', "start logging");
+    for (int i = 0; i < NUMBER_OF_CLIENTS; i++) {
+        need_to_close[i][1] = 0;
+        last[i] = -1;
+    }
+
+    log_m('s', 'l', 0, "start logging");
 
     while (1) {
         // accept incoming client
@@ -56,12 +71,21 @@ int main() {
         }
         // create for each client a thread
         pthread_t thread_id;
-        if (pthread_create(&thread_id, NULL, handle_client, (void*)&new_socket) < 0) {
+        struct thread_arg arg;
+        arg.sock = new_socket;
+        arg.id = get_next_id();
+        if(arg.id == -1) {
+            usleep(1000000);
+            continue;
+        }
+        need_to_close[arg.id][0] = false;
+        last[arg.id] = -1;
+        if (pthread_create(&thread_id, NULL, handle_client, (void*)&arg) < 0) {
             printf("could not create thread for client\n");
             close(new_socket);
             continue;
         }
-        
+
         // if thread terminates, give back resources to system without
         // need to join it
         pthread_detach(thread_id);

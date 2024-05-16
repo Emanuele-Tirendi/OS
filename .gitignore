@@ -1,0 +1,4 @@
+.vscode*
+log/*
+server/server
+client/client

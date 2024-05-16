@@ -1,5 +1,13 @@
 #include "constants.h"
 
+int get_no_digits(int n) {
+    int count = 0;
+    do {
+        n /= 10;
+        ++count;
+    } while (n != 0);
+}
+
 // string compare without length
 int strcmp_wl(char* str1, char* str2) {
     int i = 0;

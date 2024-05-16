@@ -47,8 +47,8 @@ int main() {
         printf("\nClient cannot connect to server \n");
         return 0;
     }
-    
-    log_m('c', 'l', "start logging");
+
+    log_m('c', 'l', (int) getpid(), "start logging");
 
     // initialize user handler and server handler
     pthread_t user_handler_id, server_handler_id;

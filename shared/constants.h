@@ -13,7 +13,12 @@
 // wait how long for sending back pong
 #define PINGPONG_WAIT 1000000
 
+// number of clients supported
+#define NUMBER_OF_CLIENTS 100
+
 // string compare without length
 int strcmp_wl(char* str1, char* str2);
+
+int get_no_digits(int n);
 
 #endif

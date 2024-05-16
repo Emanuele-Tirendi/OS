@@ -19,6 +19,7 @@
 #include <sys/types.h>
 
 #include "IO.h"
+#include "html.h"
 #include "../shared/constants.h"
 #include "../shared/time.h"
 #include "../shared/log.h"
@@ -38,11 +39,15 @@ another procedure sets it to true again.
 bool user_input_possible = false;
 bool need_to_close = false;
 
+time_t last = -1;
+
 void close_socket(int sock) {
-    log_m('c', 'l', "connection lost");
-    printf("CONNECTION LOST");
     close(sock);
     need_to_close = true;
+    const char *filename = "index.html";
+    if (access(filename, F_OK) != -1) {
+        remove("index.html");
+    }
 }
 
 void* send_pong(void* socket_desc) {
@@ -55,8 +60,8 @@ void* send_pong(void* socket_desc) {
 }
 
 void handle_pingpong(int sock) {
-    if (in_time()) {
-        log_m('c', 'p', "PING");
+    if (in_time(&last)) {
+        log_m('c', 'p', getpid(), "PING");
 
         pthread_t thread_id;
         if (pthread_create(&thread_id, NULL, send_pong, (void*)&sock) < 0) {
@@ -72,8 +77,15 @@ void handle_pingpong(int sock) {
 }
 
 void handle_echo() {
-    log_m('c', 'l', "echo");
+    log_m('c', 'l', getpid(), "echo");
     user_input_possible = true;
+}
+
+void handleQuit(int sock) {
+        send(sock, "quit\n", strlen("quit\n"), 0);
+        log_m('c', 'l', getpid(), "quit application");
+        printf("quit application");
+        close_socket(sock);
 }
 
 /*
@@ -84,8 +96,16 @@ function.
 void handle_user_command(char* user_input, int sock) {
     if (strcmp_wl(user_input, "echo\n") == 0) {
         send(sock, user_input, strlen(user_input), 0);
+    } else if (strcmp_wl(user_input, "quit\n") == 0){
+        handleQuit(sock);
+    } else if (strcmp_wl(user_input, "html\n") == 0) {
+        send(sock, user_input, strlen(user_input), 0);
+    } else if (strcmp_wl(user_input, "pid\n") == 0) {
+        printf("pid: %d\n", (int) getpid());
+        user_input_possible = true;
     } else {
         printf("not valid user command: %s", user_input);
+        user_input_possible = true;
     }
 }
 
@@ -99,6 +119,9 @@ void handle_server_command(char* server_input, int sock) {
         handle_echo();
     } else if (strcmp_wl(server_input, "PING") == 0) {
         handle_pingpong(sock);
+    } else if (strncmp(server_input, "<!DOCTYPE html>", strlen("<!DOCTYPE html>")) == 0) {
+        get_html_and_open(server_input);
+        user_input_possible = true;
     } else {
         printf("not valid server command: %s\n", server_input);
     }
@@ -147,7 +170,11 @@ void* handle_server(void* input) {
         ssize_t bytes_received = recv(sock, server_input, SERVER_INPUT_SIZE, 0);
         // detect if connection is lost
         if (bytes_received == 0) {
-            close_socket(sock);
+            if (!need_to_close) {
+                log_m('c', 'l', getpid(), "connection lost");
+                printf("CONNECTION LOST");
+                close_socket(sock);
+            }
         }
         if (need_to_close) {
             exit(0);
