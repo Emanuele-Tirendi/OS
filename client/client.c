@@ -51,6 +51,15 @@ void handle_user_command(char* user_input, int sock) {
     else if (strcmp_wl(user_input, "html\n") == 0) {
         send(sock, user_input, strlen(user_input), 0);
     }
+    else if (strncmp(user_input, "insert", strlen("insert")) == 0){
+        send(sock, user_input, strlen(user_input), 0);
+    }
+    else if (strncmp(user_input, "delete", strlen("delete")) == 0){
+        send(sock, user_input, strlen(user_input), 0);
+    }
+    else if (strncmp(user_input, "change", strlen("change")) == 0){
+        send(sock, user_input, strlen(user_input), 0);
+    }
     else if (strcmp_wl(user_input, "quit\n") == 0){
         send(sock, user_input, strlen(user_input), 0);
         printf("Disconnect from the server\n");
@@ -77,6 +86,18 @@ void handle_server_command(char* server_input, int sock) {
         fprintf(html, "%s" ,server_input);
         fclose(html);
         system("xdg-open index.html");
+        user_input_possible = true;
+    }
+    else if(strncmp(server_input, "insert", strlen("insert")) == 0){
+        printf("server sent inserting successful!");
+        user_input_possible = true;
+    }
+    else if (strncmp(server_input, "delete", strlen("delete")) == 0){
+        printf("server sent deleting successful!");
+        user_input_possible = true;
+    }
+    else if (strncmp(server_input, "change", strlen("change")) == 0){
+        printf("server sent changing successful!");
         user_input_possible = true;
     }
     else {
@@ -180,5 +201,6 @@ int main() {
     pthread_join(server_handler_id, NULL);
     
     close(sock);
+    printf("Do i even get here?");
     return 0;
 }

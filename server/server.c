@@ -36,6 +36,113 @@ void handle_client_command(char* client_input, int sock) {
         fclose(html_file);
         send(sock, buffer, strlen(buffer), 0);
     }
+    else if (strncmp(client_input, "insert", strlen("insert")) == 0){
+        const char delimiter[] = "$";
+        char *token;
+
+        token = strtok(client_input, delimiter);
+
+        int count = 0;
+        char* parts[3];
+        while (token != NULL && count < 3) {
+            parts[count] = token;
+            count++;
+            token = strtok(NULL, delimiter);
+        }
+        int lineIndex = atoi(parts[1]);
+        char newLine[CLIENT_INPUT_SIZE];
+        strcpy(newLine, parts[2]);
+
+        char buffer[CLIENT_INPUT_SIZE];
+
+        FILE *oldFile = fopen("example.html", "r");
+        FILE *newFile = fopen("temp.html", "w");
+        int currentLine = 1;
+
+        while (fgets(buffer, sizeof(buffer), oldFile)) {
+            if (currentLine == lineIndex) {
+                fprintf(newFile, "%s", newLine);
+            }
+            fprintf(newFile, "%s", buffer);
+            currentLine++;
+        }
+        fclose(oldFile);
+        fclose(newFile);
+        remove("example.html");
+        rename("temp.html", "example.html");
+        send(sock, "insert line complete", strlen(client_input), 0);
+    }
+    else if (strncmp(client_input, "delete", strlen("delete")) == 0){
+        const char delimiter[] = "$";
+        char *token;
+
+        token = strtok(client_input, delimiter);
+
+        int count = 0;
+        char* parts[2];
+        while (token != NULL && count < 2) {
+            parts[count] = token;
+            count++;
+            token = strtok(NULL, delimiter);
+        }
+        int lineIndex = atoi(parts[1]);
+        char buffer[CLIENT_INPUT_SIZE];
+
+        FILE *oldFile = fopen("example.html", "r");
+        FILE *newFile = fopen("temp.html", "w");
+        int currentLine = 1;
+
+        while (fgets(buffer, sizeof(buffer), oldFile)) {
+            if (currentLine != lineIndex) {
+                fprintf(newFile, "%s", buffer);
+            }
+            currentLine++;
+        }
+
+        fclose(oldFile);
+        fclose(newFile);
+        remove("example.html");
+        rename("temp.html", "example.html");
+        send(sock, "delete line complete", strlen(client_input), 0);
+    }
+    else if (strncmp(client_input, "change", strlen("change")) == 0) {
+        const char delimiter[] = "$";
+        char *token;
+
+        token = strtok(client_input, delimiter);
+
+        int count = 0;
+        char* parts[3];
+        while (token != NULL && count < 3) {
+            parts[count] = token;
+            count++;
+            token = strtok(NULL, delimiter);
+        }
+        int lineIndex = atoi(parts[1]);
+        char newLine[CLIENT_INPUT_SIZE];
+        strcpy(newLine, parts[2]);
+
+        char buffer[CLIENT_INPUT_SIZE];
+
+        FILE *oldFile = fopen("example.html", "r");
+        FILE *newFile = fopen("temp.html", "w");
+        int currentLine = 1;
+
+        while (fgets(buffer, sizeof(buffer), oldFile)) {
+            if (currentLine != lineIndex) {
+                fprintf(newFile, "%s", buffer);
+            }
+            else {
+                fprintf(newFile, "%s", newLine);
+            }
+            currentLine++;
+        }
+        fclose(oldFile);
+        fclose(newFile);
+        remove("example.html");
+        rename("temp.html", "example.html");
+        send(sock, "change line complete", strlen(client_input), 0);
+    }
     else {
         printf("not valid client command: %s server\n", client_input);
     }
