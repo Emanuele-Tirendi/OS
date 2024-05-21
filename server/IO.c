@@ -71,6 +71,38 @@ void handle_client_command(char* client_input, int sock, int id) {
     } else if (strcmp_wl(client_input, "quit\n") == 0) {
         log_m('s', 'l', 0, "quit connection");
         close_socket(sock, id);
+    } else if (strncmp(client_input, "insert", strlen("insert")) == 0){
+        struct html_input parsed;
+        parse_html_input(client_input, &parsed, 'i');
+
+        append(TEMP_NAME, HTML_NAME, 1, parsed.line_index -1);
+        append_line(TEMP_NAME, parsed.content);
+        append(TEMP_NAME, HTML_NAME, parsed.line_index, -1);
+
+        remove(HTML_NAME);
+        rename(TEMP_NAME, HTML_NAME);
+        send(sock, "insert line complete", strlen(client_input), 0);
+    } else if (strncmp(client_input, "delete", strlen("delete")) == 0){
+        struct html_input parsed;
+        parse_html_input(client_input, &parsed, 'c');
+
+        append(TEMP_NAME, HTML_NAME, 1, parsed.line_index -1);
+        append(TEMP_NAME, HTML_NAME, parsed.line_index + 1, -1);
+
+        remove(HTML_NAME);
+        rename(TEMP_NAME, HTML_NAME);
+        send(sock, "change line complete", strlen(client_input), 0);
+    } else if (strncmp(client_input, "change", strlen("change")) == 0) {
+        struct html_input parsed;
+        parse_html_input(client_input, &parsed, 'c');
+
+        append(TEMP_NAME, HTML_NAME, 1, parsed.line_index -1);
+        append_line(TEMP_NAME, parsed.content);
+        append(TEMP_NAME, HTML_NAME, parsed.line_index + 1, -1);
+
+        remove(HTML_NAME);
+        rename(TEMP_NAME, HTML_NAME);
+        send(sock, "change line complete", strlen(client_input), 0);
     } else {
         printf("not valid client command: %s\n", client_input);
     }

@@ -103,6 +103,12 @@ void handle_user_command(char* user_input, int sock) {
     } else if (strcmp_wl(user_input, "pid\n") == 0) {
         printf("pid: %d\n", (int) getpid());
         user_input_possible = true;
+    } else if (strncmp(user_input, "insert", strlen("insert")) == 0){
+        send(sock, user_input, strlen(user_input), 0);
+    } else if (strncmp(user_input, "delete", strlen("delete")) == 0){
+        send(sock, user_input, strlen(user_input), 0);
+    } else if (strncmp(user_input, "change", strlen("change")) == 0){
+        send(sock, user_input, strlen(user_input), 0);
     } else {
         printf("not valid user command: %s", user_input);
         user_input_possible = true;
@@ -121,6 +127,15 @@ void handle_server_command(char* server_input, int sock) {
         handle_pingpong(sock);
     } else if (strncmp(server_input, "<!DOCTYPE html>", strlen("<!DOCTYPE html>")) == 0) {
         get_html_and_open(server_input);
+        user_input_possible = true;
+    } else if(strncmp(server_input, "insert", strlen("insert")) == 0){
+        printf("server sent inserting successful!");
+        user_input_possible = true;
+    } else if (strncmp(server_input, "delete", strlen("delete")) == 0){
+        printf("server sent deleting successful!");
+        user_input_possible = true;
+    } else if (strncmp(server_input, "change", strlen("change")) == 0){
+        printf("server sent changing successful!");
         user_input_possible = true;
     } else {
         printf("not valid server command: %s\n", server_input);
