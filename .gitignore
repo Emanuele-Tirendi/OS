@@ -1,5 +1,6 @@
 .vscode*
 log/*
 server/server
+server/example.html
 client/client
 client/index.html

@@ -84,7 +84,7 @@ void handle_client_command(char* client_input, int sock, int id) {
         send(sock, "insert line complete", strlen(client_input), 0);
     } else if (strncmp(client_input, "delete", strlen("delete")) == 0){
         struct html_input parsed;
-        parse_html_input(client_input, &parsed, 'c');
+        parse_html_input(client_input, &parsed, 'd');
 
         append(TEMP_NAME, HTML_NAME, 1, parsed.line_index -1);
         append(TEMP_NAME, HTML_NAME, parsed.line_index + 1, -1);

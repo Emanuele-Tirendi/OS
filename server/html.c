@@ -65,6 +65,7 @@ void append_line(char* target, char* content) {
 }
 
 void initialize_html() {
+    remove(HTML_NAME);
     append(HTML_NAME, ORIGINAL_NALE, 1, -1);
 }
 
