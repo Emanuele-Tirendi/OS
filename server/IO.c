@@ -98,8 +98,6 @@ void *handle_client(void *socket_desc) {
         // detect if clients isn't connected anymore
         if (bytes_received == 0) {
             if (!need_to_close[id][0]) {
-                log_m('s', 'l', 0, "connection lost");
-                printf("CONNECTION LOST");
                 close_socket(sock, id);
             }
         }

@@ -2,3 +2,4 @@
 log/*
 server/server
 client/client
+client/index.html
