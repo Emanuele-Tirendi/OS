@@ -1,3 +1,5 @@
+<!--- TODO: describe interface for building and CLI interface precisely --->
+
 ## Server
 
 Go to root folder of this project.
