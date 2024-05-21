@@ -8,6 +8,15 @@
 
 #include "../shared/constants.h"
 
+#define ORIGINAL_NALE "original.html"
+#define HTML_NAME "example.html"
+#define TEMP_NAME "temp.html"
+
+struct html_input {
+    int line_index;
+    char content[CLIENT_INPUT_SIZE];
+};
+
 void parse_html_input(char* client_input, struct html_input* parsed_inputs, char mode) {
     const char delimiter[] = "$";
     char *token;
@@ -37,6 +46,8 @@ void parse_html_input(char* client_input, struct html_input* parsed_inputs, char
     }
 }
 
+// for appending from parameter "from" to the end of file without knowing the length
+// just insert -1 for "to"
 void append(char* target, char* source, int from, int to) {
     FILE *sourcefile = fopen(source, "r");
     FILE *targetfile = fopen(target, "a");
@@ -62,6 +73,53 @@ void append_line(char* target, char* content) {
     FILE* targetfile = fopen(target, "a");
     fprintf(targetfile, "%s", content);
     fclose(targetfile);
+}
+
+void insert(int line_index, char* content) {
+    append(TEMP_NAME, HTML_NAME, 1, line_index -1);
+    append_line(TEMP_NAME, content);
+    append(TEMP_NAME, HTML_NAME, line_index, -1);
+
+    remove(HTML_NAME);
+    rename(TEMP_NAME, HTML_NAME);
+}
+
+void delete(int line_index) {
+    append(TEMP_NAME, HTML_NAME, 1, line_index -1);
+    append(TEMP_NAME, HTML_NAME, line_index + 1, -1);
+
+    remove(HTML_NAME);
+    rename(TEMP_NAME, HTML_NAME);
+}
+
+void change(int line_index, char* content) {
+    append(TEMP_NAME, HTML_NAME, 1, line_index -1);
+    append_line(TEMP_NAME, content);
+    append(TEMP_NAME, HTML_NAME, line_index + 1, -1);
+
+    remove(HTML_NAME);
+    rename(TEMP_NAME, HTML_NAME);
+}
+
+void handle_insert(char* client_input) {
+    struct html_input parsed;
+    parse_html_input(client_input, &parsed, 'i');
+
+    insert(parsed.line_index, parsed.content);
+}
+
+void handle_delete(char* client_input) {
+    struct html_input parsed;
+    parse_html_input(client_input, &parsed, 'd');
+
+    delete(parsed.line_index);
+}
+
+void handle_change(char* client_input) {
+    struct html_input parsed;
+    parse_html_input(client_input, &parsed, 'c');
+
+    change(parsed.line_index, parsed.content);
 }
 
 void initialize_html() {

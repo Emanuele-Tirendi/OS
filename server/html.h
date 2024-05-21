@@ -3,22 +3,11 @@
 
 #include "../shared/constants.h"
 
-#define ORIGINAL_NALE "original.html"
-#define HTML_NAME "example.html"
-#define TEMP_NAME "temp.html"
+void handle_insert(char* client_input);
 
-struct html_input {
-    int line_index;
-    char content[CLIENT_INPUT_SIZE];
-};
+void handle_delete(char* client_input);
 
-void parse_html_input(char* client_input, struct html_input* parsed_inputs, char mode);
-
-// for appending from parameter "from" to the end of file without knowing the length
-// just insert -1 for "to"
-void append(char* target, char* source, int from, int to);
-
-void append_line(char* target, char* content);
+void handle_change(char* client_input);
 
 void initialize_html();
 
