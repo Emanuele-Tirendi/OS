@@ -9,6 +9,7 @@
 #include "../shared/time.h"
 #include "../shared/log.h"
 #include "IO.h"
+#include "html.h"
 
 int get_next_id() {
     for (int i = 0; i < NUMBER_OF_CLIENTS; i++) {
@@ -60,6 +61,8 @@ int main() {
     }
 
     log_m('s', 'l', 0, "start logging");
+
+    initialize_html();
 
     while (1) {
         // accept incoming client

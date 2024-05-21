@@ -39,14 +39,14 @@ void parse_html_input(char* client_input, struct html_input* parsed_inputs, char
 
 void append(char* target, char* source, int from, int to) {
     FILE *sourcefile = fopen(source, "r");
-    FILE *targetfile = fopen(target, "w");
+    FILE *targetfile = fopen(target, "a");
     char buffer[CLIENT_INPUT_SIZE];
     int currentLine = 1;
     while (fgets(buffer, sizeof(buffer), sourcefile)) {
-            if (currentLine >= from && currentLine <= to) {
+            if (currentLine >= from) {
                 fprintf(targetfile, "%s", buffer);
             }
-            if (currentLine > to) {
+            if (currentLine == to) {
                 break;
             }
             currentLine++;
@@ -59,9 +59,13 @@ void append(char* target, char* source, int from, int to) {
 }
 
 void append_line(char* target, char* content) {
-    FILE* targetfile = fopen(target, "w");
+    FILE* targetfile = fopen(target, "a");
     fprintf(targetfile, "%s", content);
     fclose(targetfile);
+}
+
+void initialize_html() {
+    append(HTML_NAME, ORIGINAL_NALE, 1, -1);
 }
 
 void send_html(int sock) {

@@ -3,6 +3,7 @@
 
 #include "../shared/constants.h"
 
+#define ORIGINAL_NALE "original.html"
 #define HTML_NAME "example.html"
 #define TEMP_NAME "temp.html"
 
@@ -18,6 +19,8 @@ void parse_html_input(char* client_input, struct html_input* parsed_inputs, char
 void append(char* target, char* source, int from, int to);
 
 void append_line(char* target, char* content);
+
+void initialize_html();
 
 void send_html(int sock);
 
