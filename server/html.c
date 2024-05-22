@@ -7,44 +7,12 @@
 #include <stdlib.h>
 
 #include "../shared/constants.h"
+#include "../shared/log.h"
+#include "../shared/html.h"
 
 #define ORIGINAL_NALE "original.html"
 #define HTML_NAME "example.html"
 #define TEMP_NAME "temp.html"
-
-struct html_input {
-    int line_index;
-    char content[CLIENT_INPUT_SIZE];
-};
-
-void parse_html_input(char* client_input, struct html_input* parsed_inputs, char mode) {
-    const char delimiter[] = "$";
-    char *token;
-
-    token = strtok(client_input, delimiter);
-
-    int no_parts;
-    if (mode == 'd') {
-        no_parts = 2;
-    } else if (mode == 'i' || mode == 'c') {
-        no_parts = 3;
-    } else {
-        // TODO: handle
-    }
-
-    int count = 0;
-    char* parts[no_parts];
-    while (token != NULL && count < no_parts) {
-        parts[count] = token;
-        count++;
-        token = strtok(NULL, delimiter);
-    }
-
-    parsed_inputs->line_index = atoi(parts[1]);
-    if (mode == 'i' || mode == 'c') {
-        strcpy(parsed_inputs->content, parts[2]);
-    }
-}
 
 // for appending from parameter "from" to the end of file without knowing the length
 // just insert -1 for "to"
@@ -76,7 +44,9 @@ void append_line(char* target, char* content) {
 }
 
 void insert(int line_index, char* content) {
-    append(TEMP_NAME, HTML_NAME, 1, line_index -1);
+    if (line_index > 1) {
+        append(TEMP_NAME, HTML_NAME, 1, line_index -1);
+    }
     append_line(TEMP_NAME, content);
     append(TEMP_NAME, HTML_NAME, line_index, -1);
 
@@ -85,7 +55,9 @@ void insert(int line_index, char* content) {
 }
 
 void delete(int line_index) {
-    append(TEMP_NAME, HTML_NAME, 1, line_index -1);
+    if (line_index > 1) {
+        append(TEMP_NAME, HTML_NAME, 1, line_index -1);
+    }
     append(TEMP_NAME, HTML_NAME, line_index + 1, -1);
 
     remove(HTML_NAME);
@@ -93,7 +65,9 @@ void delete(int line_index) {
 }
 
 void change(int line_index, char* content) {
-    append(TEMP_NAME, HTML_NAME, 1, line_index -1);
+    if (line_index > 1) {
+        append(TEMP_NAME, HTML_NAME, 1, line_index -1);
+    }
     append_line(TEMP_NAME, content);
     append(TEMP_NAME, HTML_NAME, line_index + 1, -1);
 
@@ -104,7 +78,6 @@ void change(int line_index, char* content) {
 void handle_insert(char* client_input) {
     struct html_input parsed;
     parse_html_input(client_input, &parsed, 'i');
-
     insert(parsed.line_index, parsed.content);
 }
 
@@ -131,7 +104,11 @@ void send_html(int sock) {
     FILE *html_file;
     html_file = fopen(HTML_NAME, "r");
     char buffer[SERVER_INPUT_SIZE];
-    int i = 0;
+    buffer[0] = 'h';
+    buffer[1] = 't';
+    buffer[2] = 'm';
+    buffer[3] = 'l';
+    int i = 4;
     char c;
     while((c = fgetc(html_file)) != EOF){
         buffer[i] = c;
@@ -141,4 +118,5 @@ void send_html(int sock) {
 
     fclose(html_file);
     send(sock, buffer, strlen(buffer), 0);
+    log_m('s', 'l', 0, "sent html");
 }

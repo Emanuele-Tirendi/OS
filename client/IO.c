@@ -41,6 +41,15 @@ bool need_to_close = false;
 
 time_t last = -1;
 
+void handle_file_operations(int sock, char* user_input, char op) {
+    if (valid_file_operation_input(user_input, op)) {
+        send(sock, user_input, strlen(user_input), 0);
+    } else {
+        printf("Either syntax error or newline in string or number smaller than zero.\n");
+        user_input_possible = true;
+    }
+}
+
 void close_socket(int sock) {
     close(sock);
     need_to_close = true;
@@ -98,17 +107,20 @@ void handle_user_command(char* user_input, int sock) {
         send(sock, user_input, strlen(user_input), 0);
     } else if (strcmp_wl(user_input, "quit\n") == 0){
         handleQuit(sock);
-    } else if (strcmp_wl(user_input, "html\n") == 0) {
+    } else if (strcmp_wl(user_input, "get_html\n") == 0) {
         send(sock, user_input, strlen(user_input), 0);
+    } else if (strcmp_wl(user_input, "open_html\n") == 0) {
+        open_html();
+        user_input_possible = true;
     } else if (strcmp_wl(user_input, "pid\n") == 0) {
         printf("pid: %d\n", (int) getpid());
         user_input_possible = true;
     } else if (strncmp(user_input, "insert", strlen("insert")) == 0){
-        send(sock, user_input, strlen(user_input), 0);
+        handle_file_operations(sock, user_input, 'i');
     } else if (strncmp(user_input, "delete", strlen("delete")) == 0){
-        send(sock, user_input, strlen(user_input), 0);
+        handle_file_operations(sock, user_input, 'd');
     } else if (strncmp(user_input, "change", strlen("change")) == 0){
-        send(sock, user_input, strlen(user_input), 0);
+        handle_file_operations(sock, user_input, 'c');
     } else {
         printf("not valid user command: %s", user_input);
         user_input_possible = true;
@@ -125,8 +137,8 @@ void handle_server_command(char* server_input, int sock) {
         handle_echo();
     } else if (strcmp_wl(server_input, "PING") == 0) {
         handle_pingpong(sock);
-    } else if (strncmp(server_input, "<!DOCTYPE html>", strlen("<!DOCTYPE html>")) == 0) {
-        get_html_and_open(server_input);
+    } else if (strncmp(server_input, "html", strlen("html")) == 0) {
+        get_html(server_input);
         user_input_possible = true;
     } else if(strncmp(server_input, "insert", strlen("insert")) == 0){
         printf("server sent inserting successful!");

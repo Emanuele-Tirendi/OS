@@ -66,7 +66,7 @@ void handle_client_command(char* client_input, int sock, int id) {
         handle_echo(sock);
     } else if (strcmp_wl(client_input, "PONG") == 0) {
         handle_pingpong(sock, id);
-    } else if (strcmp_wl(client_input, "html\n") == 0){
+    } else if (strcmp_wl(client_input, "get_html\n") == 0){
         send_html(sock);
     } else if (strcmp_wl(client_input, "quit\n") == 0) {
         log_m('s', 'l', 0, "quit connection");
