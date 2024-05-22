@@ -5,3 +5,8 @@ test delete, change, insert in:
 - non-empty file in the middle
 - non-empty file at the end
 - non-empty file out of bounds
+
+additionally after implementing operations with line id
+- before file was sent
+- get file, other client makes change, this client makes change, changes on different lines, all 9 combinations
+- get file, other client makes change, this client makes change, changes on same lines, all 9 combinations
