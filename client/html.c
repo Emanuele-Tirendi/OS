@@ -34,5 +34,6 @@ void get_html(char server_input[]) {
 }
 
 void open_html() {
+        // TODO: handle if file isn't on system
         system("xdg-open index.html");
 }
