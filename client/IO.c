@@ -87,6 +87,7 @@ void handle_pingpong(int sock) {
 
 void handle_echo() {
     log_m('c', 'l', getpid(), "echo");
+    printf("echo");
     user_input_possible = true;
 }
 

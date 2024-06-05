@@ -50,6 +50,8 @@ int main() {
 
     log_m('c', 'l', (int) getpid(), "start logging");
 
+    // delete html if present
+
     // initialize user handler and server handler
     pthread_t user_handler_id, server_handler_id;
     pthread_attr_t user_handler_attr, server_handler_attr;
