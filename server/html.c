@@ -84,14 +84,12 @@ void handle_insert(char* client_input) {
 void handle_delete(char* client_input) {
     struct html_input parsed;
     parse_html_input(client_input, &parsed, 'd');
-
     delete(parsed.line_index);
 }
 
 void handle_change(char* client_input) {
     struct html_input parsed;
     parse_html_input(client_input, &parsed, 'c');
-
     change(parsed.line_index, parsed.content);
 }
 

@@ -34,6 +34,7 @@ void get_html(char server_input[]) {
 }
 
 void open_html() {
-        // TODO: handle if file isn't on system
+        // if file is not present, it is printed:
+        // gio: file:///home/emanuele/Documents/OS/OS/client/index.html: Error when getting information for file “/home/emanuele/Documents/OS/OS/client/index.html”: No such file or directory
         system("xdg-open index.html");
 }
