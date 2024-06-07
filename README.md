@@ -10,6 +10,7 @@ This is a webserver that stores a `html` page, supports several concurrent clien
 * This software was developed and tested on **Ubuntu 22.04.4 LTS** on **Oracle VM VirtualBox Manager**.
 * For installing the software you need **git**.
 * For building and running the software you need **gcc** where version **gcc \(Ubuntu 11.4.0-1ubuntu1~22.04\) 11.4.0** and **python3** where version **Python 3.10.12** was used for development and testing.
+* If you connect clients and servers on different devices, use Hamachi for having a network.
 
 #### How to get the code
 * Open a terminal and type
@@ -72,4 +73,4 @@ Note here that losing the connection and losing the connection due to Ping-Pong 
 
 ## Ping-Pong and Client-Server-Communication
 
-Client and server have two parallel communications. One is the communication cascade triggered by a user input in the client and the other one is the Ping-Pong-communication. In the Ping-Pong-communication, client and server exchange Ping- and Pong-messages and each time they get one such message, a timer is reset to zero and counts the time until the next Ping- or Pong-message arrives. If the time expires before the next Ping- or Pong-message arrives, it will have as consequence that the program detecting this will cut off the connection to the other progeam.
+Client and server have two parallel communications. One is the communication cascade triggered by a user input in the client and the other one is the Ping-Pong-communication. In the Ping-Pong-communication, client and server exchange Ping- and Pong-messages and each time they get one such message, a timer is reset to zero and counts the time until the next Ping- or Pong-message arrives. If the time expires before the next Ping- or Pong-message arrives, it will have as consequence that the program detecting this will cut off the connection to the other program.
