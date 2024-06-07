@@ -9,10 +9,33 @@
 #include "../shared/constants.h"
 #include "../shared/log.h"
 #include "../shared/html.h"
+#include "id.h"
 
 #define ORIGINAL_NALE "original.html"
 #define HTML_NAME "example.html"
 #define TEMP_NAME "temp.html"
+
+int get_length(char* file_name) {
+    FILE *fp;
+    int count = 0; // Line counter (result)
+    char c; // To store a character read from file
+ 
+    // Open the file
+    fp = fopen(file_name, "r");
+ 
+    // Check if file exists
+    if (fp == NULL)
+    {
+        return -1;
+    }
+ 
+    // Extract characters from file and store in character c
+    for (c = getc(fp); c != EOF; c = getc(fp))
+        if (c == '\n') // Increment count if this character is newline
+            count = count + 1;
+ 
+    return count;
+}
 
 // for appending from parameter "from" to the end of file without knowing the length
 // just insert -1 for "to"
@@ -75,22 +98,85 @@ void change(int line_index, char* content) {
     rename(TEMP_NAME, HTML_NAME);
 }
 
-void handle_insert(char* client_input) {
+int handle_insert(char* client_input) {
     struct html_input parsed;
     parse_html_input(client_input, &parsed, 'i');
-    insert(parsed.line_index, parsed.content);
+    int id = get_lineid_from_lineindex(parsed.line_index);
+    if (id > 0) {
+        if (!insert_id(id)) {
+            return 0;
+        }
+        insert(parsed.line_index, parsed.content);
+        return 1;
+    }
+    return 0;
 }
 
-void handle_delete(char* client_input) {
+int handle_id_insert(char* client_input) {
+    struct html_input parsed;
+    client_input += 3;
+    parse_html_input(client_input, &parsed, 'i');
+    int line_index = get_lineindex_from_lineid(parsed.line_index);
+    if (line_index > 0) {
+        if (!insert_id(parsed.line_index)) {
+            return 0;
+        }
+        insert(line_index, parsed.content);
+        return 1;
+    }
+    return 0;
+}
+
+int handle_delete(char* client_input) {
     struct html_input parsed;
     parse_html_input(client_input, &parsed, 'd');
-    delete(parsed.line_index);
+    int id = get_lineid_from_lineindex(parsed.line_index);
+    if (id > 0) {
+        if (!delete_id(id)) {
+            return 0;
+        }
+        delete(parsed.line_index);
+        return 1;
+    }
+    return 0;
 }
 
-void handle_change(char* client_input) {
+int handle_id_delete(char* client_input) {
+    struct html_input parsed;
+    client_input += 3;
+    parse_html_input(client_input, &parsed, 'd');
+    int line_index = get_lineindex_from_lineid(parsed.line_index);
+    if (line_index > 0) {
+        if (!delete_id(parsed.line_index) == 1) {
+            return 0;
+        }
+        delete(line_index);
+        return 1;
+    }
+    return 0;
+}
+
+int handle_change(char* client_input) {
     struct html_input parsed;
     parse_html_input(client_input, &parsed, 'c');
-    change(parsed.line_index, parsed.content);
+    int id = get_lineid_from_lineindex(parsed.line_index);
+    if (id > 0) {
+        change(parsed.line_index, parsed.content);
+        return 1;
+    }
+    return 0;
+}
+
+int handle_id_change(char* client_input) {
+    struct html_input parsed;
+    client_input += 3;
+    parse_html_input(client_input, &parsed, 'c');
+    int line_index = get_lineindex_from_lineid(parsed.line_index);
+    if (line_index > 0) {
+        change(line_index, parsed.content);
+        return 1;
+    }
+    return 0;
 }
 
 void initialize_html() {
@@ -106,7 +192,7 @@ void send_html(int sock) {
     buffer[1] = 't';
     buffer[2] = 'm';
     buffer[3] = 'l';
-    int i = 4;
+    int i = get_ids(buffer+4) + 4;
     char c;
     while((c = fgetc(html_file)) != EOF){
         buffer[i] = c;
