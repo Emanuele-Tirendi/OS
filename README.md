@@ -40,7 +40,7 @@ Through the command line you can interact with the client. The following command
 |`echo`|Sends an `echo` to the server which prints it on standard output and sends one back to the client which prints it on standard output as well.|
 |`quit`|Closes the client.|
 |`get_html`|Sends a request to the server to get the `html` file the server stores.|
-|`open_html`|Opens the `html` file that the client sores. If `open_html` is called without calling `get_html` before, an error message is printed to standard output.|
+|`open_html`|Opens the `html` file that the client stores. If `open_html` is called without calling `get_html` first, an error message is printed to standard output.|
 |`pid`|Returns the process id of the client.|
 |`insert$<number>$<content>`|Inserts in the `html` file stored on the server, but not in the `html` file stored on the client, one line. For having this change on the client, you need to call `get_html` again. In inserts a line containing `<content>` right above the `<number>`-th line. Here with `<number>`-th line it is meant the `<number>`-th line in the `html` file stored on the server, not stored on the client. <ul><li>An error is printed to standard output and nothing else happens when `<number>` is smaller than or equal to 0.</li><li>Am error is printed to standard output and nothing else happens when `<content>` contains a `\n` or a `$` character.</li><li>A message is printed to standard output and nothing else happens when `<number>` is bigger than the biggest line index on the `html` file.</li></ul>|
 |`delete$<number>`|Deletes in the `html` file stored on the server, but not in the `html` file stored on the client, the `<number>`-th line. For having this change on the client, you need to call `get_html` again. Here with `<number>`-th line it is meant the `<number>`-th line in the `html` file stored on the server, not stored on the client. <ul><li>An error is printed to standard output and nothing else happens when `<number>` is smaller than or equal to 0.</li><li>A message is printed to standard output and nothing else happens when `<number>` is bigger than the biggest line index on the `html` file.</li></ul>|
@@ -48,13 +48,13 @@ Through the command line you can interact with the client. The following command
 |`id$insert$<number>$<content>`|Inserts in the `html` file stored on the server, but not in the `html` file stored on the client, one line. For having this change on the client, you need to call `get_html` again. In inserts a line containing `<content>` right above the line on the server that corresponds to the `<number>`-th line on the client but that might have another line index because of inconsistencies due to concurrent access of the `html` file on the server. <ul><li>An error is printed to standard output and nothing else happens when `<number>` is smaller than or equal to 0.</li><li>Am error is printed to standard output and nothing else happens when `<content>` contains a `\n` or a `$` character.</li><li>A message is printed to standard output and nothing else happens if the corresponding line on the server doesn't exist anymore.</li></ul>|
 |`id$delete$<number>`|Deletes in the `html` file stored on the server, but not in the `html` file stored on the client, a  line. For having this change on the client, you need to call `get_html` again. Here with `<number>`-th line it is meant the line on on the server that corresponds to the `<number>`-th line on the client but that might have another line index because of inconsistencies due to concurrent access of the `html` file on the server. . <ul><li>An error is printed to standard output and nothing else happens when `<number>` is smaller than or equal to 0.</li><li>A message is printed to standard output and nothing else happens if the corresponding line on the server doesn't exist anymore.</li></ul>|
 |`id$change$<number>$<content>`|Changes in the `html` file stored on the server, but not in the `html` file stored on the client, one line. For having this change on the client, you need to call `get_html` again. In changes to `<content>` the content of the line on the server that corresponds to the `<number>`-th line on the client but that might have another line index because of inconsistencies due to concurrent access of the `html` file on the server. <ul><li>An error is printed to standard output and nothing else happens when `<number>` is smaller than or equal to 0. </li><li>Am error is printed to standard output and nothing else happens when `<content>` contains a `\n` or a `$` character.</li><li>A message is printed to standard output and nothing else happens if the corresponding line on the server doesn't exist anymore.</li></ul>|
-|`check_id`|Prints on the client and on the server internally held information for the identification of lines used by `id$insert`, `id$delete` and `id$change`.|
+|`check_id`|Prints on the client and on the server some internally held information which are used for the identification of lines which is important for the calls `id$insert`, `id$delete` and `id$change`.|
 
 As of now, only 20 lines in the `html` file are supported and a file size of at most 4'000 characters.
 
 ## Logging
 
-The server and the client, each of them has two own logging files while several clients have separate pairs of logging files. The server hand each client has one file with Ping-Pong-Information and one file with general purpose logging.
+The server and the client each of them has two own logging files while different clients have separate pairs of logging files. The server and each client has one file with Ping-Pong-Information logging and one file with general purpose logging.
 
 Each client's logging files will be named with the process ids of the clients such that if several clients run on the same device or if old logging files haven't been deleted, it is clearly recognizable which client the logging files belong to.
 
@@ -68,7 +68,7 @@ Following events are logged:
 * server loggs: when a new client connection establishes and when a client quits or the connection is lost
 * client loggs: when the connection to a server is lost
 
-Note here that losing the connection and losing the connection due to Ping-Pong inactivity aren't the same thing. Losing the connection due to Ping-Pong can happen even if there is a good connection, but the Ping-Pong time expires. For that, see more under section Ping-Pong.
+Note here that losing the connection and losing the connection due to Ping-Pong inactivity aren't the same thing. Losing the connection due to Ping-Pong inactivity can happen even if there is a good connection, but the Ping-Pong time expires. For that, see more under section Ping-Pong.
 
 ## Ping-Pong and Client-Server-Communication
 
