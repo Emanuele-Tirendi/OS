@@ -54,7 +54,7 @@ void handle_pingpong(int sock, int id) {
         pthread_detach(thread_id);
     } else {
         log_m('s', 'l', 0, "connection lost due to pingpong");
-        printf("CONNECTION LOST DUE TO PINGPONG");
+        printf("CONNECTION LOST DUE TO PINGPONG\n");
         close_socket(sock, id);
     }
 }
@@ -156,6 +156,7 @@ void *handle_client(void *socket_desc) {
             sprintf(buffer, "close connection for %d", id);
             log_m('s', 'l', 0, buffer);
             need_to_close[id][1] = false;
+            pthread_mutex_unlock(&mutex);
             return NULL;
         }
         handle_client_command(client_input, sock, id);

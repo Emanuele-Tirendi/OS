@@ -80,7 +80,7 @@ void* send_pong(void* socket_desc) {
 }
 
 void handle_pingpong(int sock) {
-    if (in_time(&last)) {
+    if (true) {
         log_m('c', 'p', getpid(), "PING");
 
         pthread_t thread_id;
@@ -92,7 +92,7 @@ void handle_pingpong(int sock) {
         // need to join it
         pthread_detach(thread_id);
     } else {
-        close_socket(sock);
+        //close_socket(sock);
     }
 }
 
@@ -155,6 +155,7 @@ function.
 */
 void handle_server_command(char* server_input, int sock) {
     if (strcmp_wl(server_input, "echo\n") == 0) {
+        sleep(10);
         handle_echo();
     } else if (strcmp_wl(server_input, "PING") == 0) {
         handle_pingpong(sock);

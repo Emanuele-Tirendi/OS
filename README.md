@@ -50,7 +50,7 @@ Through the command line you can interact with the client. The following command
 |`id$change$<number>$<content>`|Changes in the `html` file stored on the server, but not in the `html` file stored on the client, one line. For having this change on the client, you need to call `get_html` again. In changes to `<content>` the content of the line on the server that corresponds to the `<number>`-th line on the client but that might have another line index because of inconsistencies due to concurrent access of the `html` file on the server. <ul><li>An error is printed to standard output and nothing else happens when `<number>` is smaller than or equal to 0. </li><li>Am error is printed to standard output and nothing else happens when `<content>` contains a `\n` or a `$` character.</li><li>A message is printed to standard output and nothing else happens if the corresponding line on the server doesn't exist anymore.</li></ul>|
 |`check_id`|Prints on the client and on the server some internally held information which are used for the identification of lines which is important for the calls `id$insert`, `id$delete` and `id$change`.|
 
-As of now, only 20 lines in the `html` file are supported and a file size of at most 4'000 characters.
+As of now, only ... lines in the `html` file are supported and a file size of at most 9'500 characters. We could supoort much larger files, but since we plan to print the ids of the lines with `check_id` and we don't want to print too many lines during the presentation, we limit the size of the `html` file.
 
 ## Logging
 
@@ -65,7 +65,7 @@ Following events are logged:
 * client and server logg:  Ping or Pong received
 * server loggs: when the connection to a specific client is lost due to Ping-Pong inactivity
 * client loggs: from user requested quit
-* server loggs: when a new client connection establishes and when a client quits or the connection is lost
+* server loggs: when a client quits or the connection is lost
 * client loggs: when the connection to a server is lost
 
 Note here that losing the connection and losing the connection due to Ping-Pong inactivity aren't the same thing. Losing the connection due to Ping-Pong inactivity can happen even if there is a good connection, but the Ping-Pong time expires. For that, see more under section Ping-Pong.
