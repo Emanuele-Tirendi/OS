@@ -26,13 +26,15 @@ if "-c1" in sys.argv or "-c2" in sys.argv:
     compile_status = os.system(compile_command)
     print("compiled client")
 
+ipaddress = ""
+
 if "-r2" in sys.argv:
     os.chdir("../sec_client")
     if os.path.exists("index.html"):
         os.remove("index.html")
         print("index.html removed")
     print("start running second client")
-    run_command = "./client"
+    run_command = "./client " + ipaddress
     run_status = os.system(run_command)
 
 if "-r1" in sys.argv:
@@ -40,5 +42,5 @@ if "-r1" in sys.argv:
         os.remove("index.html")
         print("index.html removed")
     print("start running first client")
-    run_command = "./client"
+    run_command = "./client " + ipaddress
     run_status = os.system(run_command)

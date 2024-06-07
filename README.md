@@ -27,7 +27,7 @@ For running the server, you need to navigate into the most top level folder of t
 
 ### Client
 
-For running the client, you need to navigate into the most top level folder of the project and call `python3 client.py [-c1] [-r1]` or `python3 client.py [-c2] [-r2]`.
+For running the client, you need to adjust the ipadrress in client.py to the ipaddress of the device that runs the server and you need to navigate into the most top level folder of the project and call `python3 client.py [-c1] [-r1]` or `python3 client.py [-c2] [-r2]`.
 * Flags `-c1` and `c2` compile the client.
 * Flags `-r1` and `-r2` run the clients.
 * You can only compile and/or run one client (i.e. use a combination of `[-c1] [-r1]`) or the other client (i.e. use a combination o f`[-c2] [-r2]`) but not use both in the same call to `python3 client.py`.
