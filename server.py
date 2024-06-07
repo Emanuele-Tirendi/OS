@@ -1,4 +1,5 @@
 import os
+import os.path
 import sys
 from pathlib import Path
 
@@ -8,6 +9,9 @@ if len(sys.argv) < 2:
 
 if len(sys.argv) > 4:
     print("too many arguments")
+
+if not os.path.exists("log"):
+    os.mkdir("log")
 
 os.chdir("server")
 

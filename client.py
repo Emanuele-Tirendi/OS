@@ -1,6 +1,10 @@
 import os
+import os.path
 import sys
 import shutil
+
+if not os.path.exists("log"):
+    os.mkdir("log")
 
 os.chdir("client")
 
@@ -26,7 +30,7 @@ if "-c1" in sys.argv or "-c2" in sys.argv:
     compile_status = os.system(compile_command)
     print("compiled client")
 
-ipaddress = ""
+ipaddress = "127.0.0.1"
 
 if "-r2" in sys.argv:
     os.chdir("../sec_client")
