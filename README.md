@@ -10,6 +10,7 @@ This is a webserver that stores a `html` page, supports several concurrent clien
 * This software was developed and tested on **Ubuntu 22.04.4 LTS** on **Oracle VM VirtualBox Manager**.
 * For installing the software you need **git**.
 * For building and running the software you need **gcc** where version **gcc \(Ubuntu 11.4.0-1ubuntu1~22.04\) 11.4.0** and **python3** where version **Python 3.10.12** was used for development and testing.
+* If you connect clients and servers on different devices, use Hamachi for having a network.
 
 #### How to get the code
 * Open a terminal and type
