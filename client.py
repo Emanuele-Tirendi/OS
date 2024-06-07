@@ -2,13 +2,6 @@ import os
 import sys
 import shutil
 
-if len(sys.argv) < 2:
-    print("provide -c for compiling and -r for running and both for both")
-    sys.exit(1)
-
-if len(sys.argv) > 3:
-    print("too many arguments")
-
 os.chdir("client")
 
 # Compile C++ code

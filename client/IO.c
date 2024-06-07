@@ -155,7 +155,6 @@ function.
 */
 void handle_server_command(char* server_input, int sock) {
     if (strcmp_wl(server_input, "echo\n") == 0) {
-        sleep(10);
         handle_echo();
     } else if (strcmp_wl(server_input, "PING") == 0) {
         handle_pingpong(sock);
