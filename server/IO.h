@@ -18,4 +18,6 @@ extern time_t last[NUMBER_OF_CLIENTS];
 
 void *handle_client(void *socket_desc);
 
+void initialize_IO();
+
 #endif
