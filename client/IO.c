@@ -19,6 +19,7 @@
 #include <sys/types.h>
 
 #include "IO.h"
+#include "html.h"
 #include "../shared/constants.h"
 #include "../shared/time.h"
 #include "../shared/log.h"
@@ -38,11 +39,35 @@ another procedure sets it to true again.
 bool user_input_possible = false;
 bool need_to_close = false;
 
+time_t last = -1;
+
+void handle_file_operations(int sock, char* user_input, char op, int id) {
+    if (id) {
+        user_input +=3;
+    }
+    int i = valid_file_operation_input(user_input, op, id);
+    if (i == 1) {
+        if (id) {
+            user_input -=3;
+        }
+        send(sock, user_input, strlen(user_input), 0);
+    } if (i == 0) {
+        printf("Either syntax error or newline in string or number smaller than or equal to zero.\n");
+        user_input_possible = true;
+    }
+    if (i == -1) {
+        printf("Line doesn't exist.\n");
+        user_input_possible = true; 
+    }
+}
+
 void close_socket(int sock) {
-    log_m('c', 'l', "connection lost");
-    printf("CONNECTION LOST");
     close(sock);
     need_to_close = true;
+    const char *filename = "index.html";
+    if (access(filename, F_OK) != -1) {
+        remove("index.html");
+    }
 }
 
 void* send_pong(void* socket_desc) {
@@ -55,8 +80,8 @@ void* send_pong(void* socket_desc) {
 }
 
 void handle_pingpong(int sock) {
-    if (in_time()) {
-        log_m('c', 'p', "PING");
+    if (true) {
+        log_m('c', 'p', getpid(), "PING");
 
         pthread_t thread_id;
         if (pthread_create(&thread_id, NULL, send_pong, (void*)&sock) < 0) {
@@ -67,13 +92,20 @@ void handle_pingpong(int sock) {
         // need to join it
         pthread_detach(thread_id);
     } else {
-        close_socket(sock);
+        //close_socket(sock);
     }
 }
 
 void handle_echo() {
-    log_m('c', 'l', "echo");
+    printf("echo\n");
     user_input_possible = true;
+}
+
+void handleQuit(int sock) {
+        send(sock, "quit\n", strlen("quit\n"), 0);
+        log_m('c', 'l', getpid(), "quit application");
+        printf("quit application");
+        close_socket(sock);
 }
 
 /*
@@ -84,8 +116,35 @@ function.
 void handle_user_command(char* user_input, int sock) {
     if (strcmp_wl(user_input, "echo\n") == 0) {
         send(sock, user_input, strlen(user_input), 0);
+    } else if (strcmp_wl(user_input, "quit\n") == 0){
+        handleQuit(sock);
+    } else if (strcmp_wl(user_input, "get_html\n") == 0) {
+        send(sock, user_input, strlen(user_input), 0);
+    } else if (strcmp_wl(user_input, "open_html\n") == 0) {
+        open_html();
+        user_input_possible = true;
+    } else if (strcmp_wl(user_input, "pid\n") == 0) {
+        printf("pid: %d\n", (int) getpid());
+        user_input_possible = true;
+    } else if (strncmp(user_input, "insert", strlen("insert")) == 0){
+        handle_file_operations(sock, user_input, 'i', 0);
+    } else if (strncmp(user_input, "delete", strlen("delete")) == 0){
+        handle_file_operations(sock, user_input, 'd', 0);
+    } else if (strncmp(user_input, "change", strlen("change")) == 0){
+        handle_file_operations(sock, user_input, 'c', 0);
+    } else if (strncmp(user_input, "id$insert", strlen("id$insert")) == 0){
+        handle_file_operations(sock, user_input, 'i', 1);
+    } else if (strncmp(user_input, "id$delete", strlen("id$delete")) == 0){
+        handle_file_operations(sock, user_input, 'd', 1);
+    } else if (strncmp(user_input, "id$change", strlen("id$change")) == 0){
+        handle_file_operations(sock, user_input, 'c', 1);
+    } else if (strncmp(user_input, "check_id", strlen("check_id")) == 0) {
+        print_ids();
+        send(sock, user_input, strlen(user_input), 0);
+        user_input_possible = true;
     } else {
         printf("not valid user command: %s", user_input);
+        user_input_possible = true;
     }
 }
 
@@ -99,6 +158,27 @@ void handle_server_command(char* server_input, int sock) {
         handle_echo();
     } else if (strcmp_wl(server_input, "PING") == 0) {
         handle_pingpong(sock);
+    } else if (strncmp(server_input, "html", strlen("html")) == 0) {
+        get_html(server_input);
+        user_input_possible = true;
+    } else if(strncmp(server_input, "insert line complete", strlen("insert line complete")) == 0){
+        printf("server sent inserting successful!\n");
+        user_input_possible = true;
+    } else if (strncmp(server_input, "delete line complete", strlen("delete line complete")) == 0){
+        printf("server sent deleting successful!\n");
+        user_input_possible = true;
+    } else if (strncmp(server_input, "change line complete", strlen("change line complete")) == 0){
+        printf("server sent changing successful!\n");
+        user_input_possible = true;
+    } else if(strncmp(server_input, "insert line not complete", strlen("insert line not complete")) == 0){
+        printf("server sent inserting not successful!\n");
+        user_input_possible = true;
+    } else if (strncmp(server_input, "delete line not complete", strlen("delete line not complete")) == 0){
+        printf("server sent deleting not successful!\n");
+        user_input_possible = true;
+    } else if (strncmp(server_input, "change line not complete", strlen("change line not complete")) == 0){
+        printf("server sent changing not successful!\n");
+        user_input_possible = true;
     } else {
         printf("not valid server command: %s\n", server_input);
     }
@@ -147,7 +227,11 @@ void* handle_server(void* input) {
         ssize_t bytes_received = recv(sock, server_input, SERVER_INPUT_SIZE, 0);
         // detect if connection is lost
         if (bytes_received == 0) {
-            close_socket(sock);
+            if (!need_to_close) {
+                log_m('c', 'l', getpid(), "connection lost");
+                printf("CONNECTION LOST");
+                close_socket(sock);
+            }
         }
         if (need_to_close) {
             exit(0);

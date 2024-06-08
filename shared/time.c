@@ -4,21 +4,20 @@
 
 #include "time.h"
 
-time_t last = -1;
-bool in_time() {
+bool in_time(time_t* last) {
     // get current time
     time_t now = time(NULL);
     // if first time to check, initialize last
-    if (last == -1) {
-        last = now;
+    if (*last == -1) {
+        *last = now;
         return true;
     } else {
         // if last time checked more than 5 seconda ago, return false
-        if ((now - last) > 5) {
+        if ((now - *last) > 5) {
             return false;
         // else, update time and return true
         } else {
-            last = now;
+            *last = now;
             return true;
         }
     }

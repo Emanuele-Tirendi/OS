@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <limits.h>
+
+#include "constants.h"
 
 void log_f(char path[], char log_message[]) {
     FILE *file = fopen(path, "a"); // Open file in append mode
@@ -27,11 +30,20 @@ void log_f(char path[], char log_message[]) {
     fclose(file);
 }
 
-void log_m(char cl_or_se, char log_mode, char log_message[]) {
+void log_m(char cl_or_se, char log_mode, int id, char log_message[]) {
+    // only used if cl_or_se == 'c'
+    char part1[] = "../log/client";
+
     if (cl_or_se == 'c' && log_mode == 'l') {
-        log_f("../log/client_log.txt", log_message);
+        char part2[] = "_log.txt";
+        char buffer[strlen(part1) + get_no_digits(INT_MAX) + strlen(part2)];
+        sprintf(buffer,"%s%d%s", part1, id, part2);
+        log_f(buffer, log_message);
     } else if (cl_or_se == 'c' && log_mode == 'p') {
-        log_f("../log/client_pingpong.txt", log_message);
+        char part2[] = "_pingpong.txt";
+        char buffer[strlen(part1) + get_no_digits(INT_MAX) + strlen(part2)];
+        sprintf(buffer,"%s%d%s", part1, id, part2);
+        log_f(buffer, log_message);
     } else if (cl_or_se == 's' && log_mode == 'l') {
         log_f("../log/server_log.txt", log_message);
     } else if (cl_or_se == 's' && log_mode == 'p') {
