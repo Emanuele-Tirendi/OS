@@ -23,6 +23,7 @@ time_t last[NUMBER_OF_CLIENTS];
 pthread_mutex_t mutex;
 
 void handle_echo(int sock) {
+    printf("Hello\n");
     send(sock, "echo\n", strlen("echo\n"), 0);
 }
 
