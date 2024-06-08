@@ -3,11 +3,17 @@
 
 #include "../shared/constants.h"
 
-void handle_insert(char* client_input);
+int handle_insert(char* client_input);
 
-void handle_delete(char* client_input);
+int handle_delete(char* client_input);
 
-void handle_change(char* client_input);
+int handle_change(char* client_input);
+
+int handle_id_insert(char* client_input);
+
+int handle_id_delete(char* client_input);
+
+int handle_id_change(char* client_input);
 
 void initialize_html();
 

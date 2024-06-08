@@ -6,6 +6,7 @@ int get_no_digits(int n) {
         n /= 10;
         ++count;
     } while (n != 0);
+    return count;
 }
 
 // string compare without length

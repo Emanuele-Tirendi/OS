@@ -7,8 +7,10 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <limits.h>
+#include <semaphore.h>
 
 #include "html.h"
+#include "id.h"
 #include "IO.h"
 #include "../shared/constants.h"
 #include "../shared/log.h"
@@ -18,8 +20,9 @@ bool need_to_close[NUMBER_OF_CLIENTS][2];
 
 time_t last[NUMBER_OF_CLIENTS];
 
+pthread_mutex_t mutex;
+
 void handle_echo(int sock) {
-    log_m('s', 'l', 0, "echo");
     send(sock, "echo\n", strlen("echo\n"), 0);
 }
 
@@ -51,7 +54,7 @@ void handle_pingpong(int sock, int id) {
         pthread_detach(thread_id);
     } else {
         log_m('s', 'l', 0, "connection lost due to pingpong");
-        printf("CONNECTION LOST DUE TO PINGPONG");
+        printf("CONNECTION LOST DUE TO PINGPONG\n");
         close_socket(sock, id);
     }
 }
@@ -72,14 +75,49 @@ void handle_client_command(char* client_input, int sock, int id) {
         log_m('s', 'l', 0, "quit connection");
         close_socket(sock, id);
     } else if (strncmp(client_input, "insert", strlen("insert")) == 0){
-        handle_insert(client_input);
-        send(sock, "insert line complete", strlen(client_input), 0);
+        int i = handle_insert(client_input);
+        if (i==1) {
+            send(sock, "insert line complete", strlen("insert line complete"), 0);
+        } else {
+            send(sock, "insert line not complete", strlen("insert line not complete"), 0);
+        }
     } else if (strncmp(client_input, "delete", strlen("delete")) == 0){
-        handle_delete(client_input);
-        send(sock, "change line complete", strlen(client_input), 0);
+        int i = handle_delete(client_input);
+        if (i==1) {
+            send(sock, "delete line complete", strlen("insert line complete"), 0);
+        } else {
+            send(sock, "delete line not complete", strlen("insert line not complete"), 0);
+        }
     } else if (strncmp(client_input, "change", strlen("change")) == 0) {
-        handle_change(client_input);
-        send(sock, "change line complete", strlen(client_input), 0);
+        int i = handle_change(client_input);
+        if (i==1) {
+            send(sock, "change line complete", strlen("insert line complete"), 0);
+        } else {
+            send(sock, "change line not complete", strlen("insert line not complete"), 0);
+        }
+    } else if (strncmp(client_input, "id$insert", strlen("id$insert")) == 0){
+        int i = handle_id_insert(client_input);
+        if (i==1) {
+            send(sock, "insert line complete", strlen("insert line complete"), 0);
+        } else {
+            send(sock, "insert line not complete", strlen("insert line not complete"), 0);
+        }
+    } else if (strncmp(client_input, "id$delete", strlen("id$delete")) == 0){
+        int i = handle_id_delete(client_input);
+        if (i==1) {
+            send(sock, "delete line complete", strlen("delete line complete"), 0);
+        } else {
+            send(sock, "delete line not complete", strlen("delete line not complete"), 0);
+        }
+    } else if (strncmp(client_input, "id$change", strlen("id$change")) == 0) {
+        int i = handle_id_change(client_input);
+        if (i==1) {
+            send(sock, "change line complete", strlen("change line complete"), 0);
+        } else {
+            send(sock, "change line not complete", strlen("change line not complete"), 0);
+        }
+    } else if (strncmp(client_input, "check_id", strlen("check_id")) == 0) {
+        print_ids();
     } else {
         printf("not valid client command: %s\n", client_input);
     }
@@ -104,6 +142,9 @@ void *handle_client(void *socket_desc) {
         memset(client_input, 0, CLIENT_INPUT_SIZE);
         // receive message from client
         ssize_t bytes_received = recv(sock, client_input, CLIENT_INPUT_SIZE, 0);
+
+        pthread_mutex_lock(&mutex);
+        
         // detect if clients isn't connected anymore
         if (bytes_received == 0) {
             if (!need_to_close[id][0]) {
@@ -115,9 +156,15 @@ void *handle_client(void *socket_desc) {
             sprintf(buffer, "close connection for %d", id);
             log_m('s', 'l', 0, buffer);
             need_to_close[id][1] = false;
+            pthread_mutex_unlock(&mutex);
             return NULL;
         }
         handle_client_command(client_input, sock, id);
+        pthread_mutex_unlock(&mutex);
     }
     return NULL;
+}
+
+void initialize_IO() {
+    pthread_mutex_init(&mutex, NULL);
 }

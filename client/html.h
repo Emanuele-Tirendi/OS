@@ -3,10 +3,14 @@
 
 #include <stdbool.h>
 
-bool valid_file_operation_input(char* user_input, char op);
+int valid_file_operation_input(char* user_input, char opc, int id);
 
 void get_html(char html[]);
 
 void open_html();
+
+void print_ids();
+
+void initialize_ids();
 
 #endif

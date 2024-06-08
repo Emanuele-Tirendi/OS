@@ -1,4 +1,5 @@
 import os
+import os.path
 import sys
 from pathlib import Path
 
@@ -8,6 +9,9 @@ if len(sys.argv) < 2:
 
 if len(sys.argv) > 4:
     print("too many arguments")
+
+if not os.path.exists("log"):
+    os.mkdir("log")
 
 os.chdir("server")
 
@@ -26,7 +30,7 @@ if "-l" in sys.argv:
     delete_files_in_directory("./../log/")
 
 if "-c" in sys.argv:
-    compile_command = "gcc server.c ../shared/constants.h ../shared/constants.c ../shared/time.h ../shared/time.c ../shared/log.h ../shared/log.c IO.h IO.c html.h html.c ../shared/html.h ../shared/html.c -o server"
+    compile_command = "gcc server.c ../shared/constants.h ../shared/constants.c ../shared/time.h ../shared/time.c ../shared/log.h ../shared/log.c IO.h IO.c html.h html.c id.h id.c ../shared/html.h ../shared/html.c -o server"
     compile_status = os.system(compile_command)
     print("compiled server")
 
