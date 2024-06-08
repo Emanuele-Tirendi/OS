@@ -6,48 +6,20 @@
 #include <pthread.h>
 
 #include "../shared/constants.h"
+#include "../shared/time.h"
+#include "../shared/log.h"
+#include "IO.h"
+#include "html.h"
+#include "id.h"
 
-#define HTML_FILE "index.html"
-
-/*
-Here we will make the main if else case distinction for the client commands. So
-if you introduce a new command coming from the client, make a new else if case in this 
-function.
-*/
-void handle_client_command(char* client_input, int sock) {
-    if (strcmp_wl(client_input, "echo\n") == 0) {
-        usleep(2000000);
-        printf("client sent %s", client_input);
-        send(sock, client_input, strlen(client_input), 0);
-    } else {
-        printf("not valid client command: %s\n", client_input);
-    }
-}
-
-void *handle_client(void *socket_desc) {
-    int* socket = (int*) socket_desc;
-    int sock = *socket;
-
-    // buffer for messages sent from client.
-    char client_input[CLIENT_INPUT_SIZE];
-    /*
-    This loop is the main loop for the thread to get messages of the client
-    and handle them.
-    */
-    while (1) {
-        // zero out the buffer
-        memset(client_input, 0, CLIENT_INPUT_SIZE);
-        // receive message from client
-        ssize_t bytes_received = recv(sock, client_input, CLIENT_INPUT_SIZE, 0);
-        // detect if clients isn't connected anymore
-        if (bytes_received == 0) {
-            printf("client not connected anymore\n");
-            close(sock);
-            return NULL;
+int get_next_id() {
+    for (int i = 0; i < NUMBER_OF_CLIENTS; i++) {
+        if (!need_to_close[i][1]) {
+            need_to_close[i][1] = true;
+            return i;
         }
-        handle_client_command(client_input, sock);
     }
-    return NULL;
+    return -1;
 }
 
 int main() {
@@ -84,6 +56,17 @@ int main() {
         return 0;
     }
     
+    for (int i = 0; i < NUMBER_OF_CLIENTS; i++) {
+        need_to_close[i][1] = 0;
+        last[i] = -1;
+    }
+
+    log_m('s', 'l', 0, "start logging");
+
+    initialize_html();
+    initialize_id();
+    initialize_IO();
+
     while (1) {
         // accept incoming client
         int new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
@@ -94,12 +77,21 @@ int main() {
         }
         // create for each client a thread
         pthread_t thread_id;
-        if (pthread_create(&thread_id, NULL, handle_client, (void*)&new_socket) < 0) {
+        struct thread_arg arg;
+        arg.sock = new_socket;
+        arg.id = get_next_id();
+        if(arg.id == -1) {
+            usleep(1000000);
+            continue;
+        }
+        need_to_close[arg.id][0] = false;
+        last[arg.id] = -1;
+        if (pthread_create(&thread_id, NULL, handle_client, (void*)&arg) < 0) {
             printf("could not create thread for client\n");
             close(new_socket);
             continue;
         }
-        
+
         // if thread terminates, give back resources to system without
         // need to join it
         pthread_detach(thread_id);

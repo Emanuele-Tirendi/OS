@@ -1,0 +1,8 @@
+.vscode*
+log/*
+server/server
+server/example.html
+client/client
+sec_client/client
+client/index.html
+sec_client/index.html
