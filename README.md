@@ -11,7 +11,7 @@ This is a webserver that stores a `html` page, supports several concurrent clien
 * For installing the software you need **git**.
 * For building and running the software you need **gcc** where version **gcc \(Ubuntu 11.4.0-1ubuntu1~22.04\) 11.4.0** and **python3** where version **Python 3.10.12** was used for development and testing.
 * If you connect clients and servers on different devices, use Hamachi for having a network.
-
+* To run the Unit tests make sure you have CUnit version 2.1-3 installed.
 #### How to get the code
 * Open a terminal and type
 `git clone https://github.com/Emanuele-Tirendi/OS.git`
@@ -74,3 +74,13 @@ Note here that losing the connection and losing the connection due to Ping-Pong 
 ## Ping-Pong and Client-Server-Communication
 
 Client and server have two parallel communications. One is the communication cascade triggered by a user input in the client and the other one is the Ping-Pong-communication. In the Ping-Pong-communication, client and server exchange Ping- and Pong-messages and each time they get one such message, a timer is reset to zero and counts the time until the next Ping- or Pong-message arrives. If the time expires before the next Ping- or Pong-message arrives, it will have as consequence that the program detecting this will cut off the connection to the other program.
+
+## Unit tests with CUnit
+
+We wrote ceveral unit test that check the main functions of our server features which are insert, delete and change.
+To run them you need to first make a few small adjustments in the code.
+* First you need to change in server/html.c line 185 so it says "append(HTML_NAME, ORIGINAL_NALE, 1, -1);" instead of "append(HTML_NAME, CHESS_NAME, 1, -1);"
+* Further you need to change line 63 in server/id.c so it says "for (int i = 1; i <= 12; i++) {" instead of "for (int i = 1; i <= 38; i++) {"
+* You also need to change line 66 server/id.c so it says "for (int i = 13; i < FILE_LENGTH; i++) {" instead of "for (int i = 39; i < FILE_LENGTH; i++) {"
+To compile the tests you need to run following command: "gcc server/html.c server/html.h server/id.c server/id.h server/IO.c server/IO.h server/test.h server/tests.c shared/constants.c shared/constants.h shared/html.c shared/html.h shared/log.c shared/log.h shared/time.c shared/time.h -o server/test -lcunit"
+And to run the tests you need to change into the server folder and run the shell command "./test".
