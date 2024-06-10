@@ -171,7 +171,7 @@ int main() {
     }
 
     CU_pSuite pSuite4 = NULL;
-    pSuite4 = CU_add_suite("Suite_3", 0, 0);
+    pSuite4 = CU_add_suite("Suite_4", 0, 0);
     if (NULL == pSuite4) {
         CU_cleanup_registry();
         return CU_get_error();
