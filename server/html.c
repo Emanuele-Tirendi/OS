@@ -183,7 +183,7 @@ int handle_id_change(char* client_input) {
 
 void initialize_html() {
     remove(HTML_NAME);
-    append(HTML_NAME, ORIGINAL_NALE, 1, -1);
+    append(HTML_NAME, CHESS_NAME, 1, -1);
 }
 
 void send_html(int sock) {

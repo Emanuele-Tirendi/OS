@@ -60,10 +60,10 @@ int delete_id(int id) {
 }
 
 void initialize_id() {
-    for (int i = 1; i <= 12; i++) {
+    for (int i = 1; i <= 38; i++) {
         line_indices[i] = i;
     }
-    for (int i = 13; i < FILE_LENGTH; i++) {
+    for (int i = 39; i < FILE_LENGTH; i++) {
         line_indices[i] = 0;
     }
 }
