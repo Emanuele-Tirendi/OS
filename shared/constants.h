@@ -17,7 +17,7 @@
 #define NUMBER_OF_CLIENTS 100
 
 // how many lines a file can have + 1
-#define FILE_LENGTH 21
+#define FILE_LENGTH 50
 
 // string compare without length
 int strcmp_wl(char* str1, char* str2);
