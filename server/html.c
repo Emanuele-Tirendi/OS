@@ -10,6 +10,7 @@
 #include "../shared/log.h"
 #include "../shared/html.h"
 #include "id.h"
+#include "test.h"
 
 #define ORIGINAL_NALE "original.html"
 #define HTML_NAME "example.html"

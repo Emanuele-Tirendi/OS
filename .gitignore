@@ -6,3 +6,4 @@ client/client
 sec_client/client
 client/index.html
 sec_client/index.html
+server/test
